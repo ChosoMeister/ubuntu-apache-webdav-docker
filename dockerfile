@@ -8,7 +8,7 @@ ENV TZ=Etc/UTC
 # Install Apache and necessary modules
 RUN apt-get update && \
     apt-get install -y apache2 apache2-utils tzdata && \
-    a2enmod dav dav_fs dav_lock && \
+    a2enmod dav dav_fs dav_lock auth_digest && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
