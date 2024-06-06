@@ -13,8 +13,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy configuration and entrypoint script
-COPY webdav.conf /etc/apache2/sites-available/webdav.conf
-RUN ln -s /etc/apache2/sites-available/webdav.conf /etc/apache2/sites-enabled/webdav.conf
+COPY webdav.conf /etc/apache2/sites-available/000-default.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
