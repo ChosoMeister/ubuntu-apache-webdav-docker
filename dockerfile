@@ -1,45 +1,19 @@
-# Use the official Ubuntu base image
-FROM ubuntu:latest
+# Base image
+FROM ubuntu:20.04
 
-# Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive
+# Install Apache and necessary modules
+RUN apt-get update && \
+    apt-get install -y apache2 apache2-utils && \
+    a2enmod dav dav_fs dav_lock && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install necessary packages
-RUN apt-get update && apt-get install -y \
-    apache2 \
-    apache2-utils \
-    libapache2-mod-authnz-external \
-    libapache2-mod-security2 \
-    davfs2 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Enable required Apache modules
-RUN a2enmod dav \
-    dav_fs \
-    dav_lock \
-    auth_digest \
-    authz_user \
-    authz_groupfile
-
-# Create WebDAV directory and set permissions
-RUN mkdir -p /var/www/webdav \
-    && chown -R www-data:www-data /var/www/webdav
-
-# Copy the WebDAV configuration file
-COPY ./webdav.conf /etc/apache2/sites-available/webdav.conf
-
-# Copy the entrypoint script
-COPY ./entrypoint.sh /entrypoint.sh
-
-# Make the entrypoint script executable
+# Copy configuration and entrypoint script
+COPY webdav.conf /etc/apache2/sites-available/webdav.conf
+RUN ln -s /etc/apache2/sites-available/webdav.conf /etc/apache2/sites-enabled/webdav.conf
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Enable the WebDAV site
-RUN a2ensite webdav \
-    && a2dissite 000-default
-
-# Expose ports
-EXPOSE 80
-
-# Set the entrypoint
+# Set the entrypoint and default command
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["apache2ctl", "-D", "FOREGROUND"]

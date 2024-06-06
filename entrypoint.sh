@@ -1,7 +1,10 @@
 #!/bin/bash
+set -e
 
-# Create .htpasswd file with username and password from environment variables
-htdigest -c /etc/apache2/.htpasswd webdav "$WEBDAV_USERNAME" <<< "$WEBDAV_PASSWORD"
+# Create password file if not exists
+if [ ! -f /etc/apache2/webdav.password ]; then
+    htpasswd -cb /etc/apache2/webdav.password "$WEBDAV_USERNAME" "$WEBDAV_PASSWORD"
+fi
 
-# Start Apache service
-apachectl -D FOREGROUND
+# Start Apache in the foreground
+exec "$@"
