@@ -1,7 +1,10 @@
 #!/bin/bash
+set -e
 
-# Create password file with encrypted password
-htpasswd -cb /etc/apache2/webdav.password $WEBDAV_USERNAME $WEBDAV_PASSWORD
+# Create password file if not exists
+if [ ! -f /etc/apache2/webdav.password ]; then
+    htpasswd -cb /etc/apache2/webdav.password "$WEBDAV_USERNAME" "$WEBDAV_PASSWORD"
+fi
 
 # Start Apache in the foreground
-apachectl -D FOREGROUND
+exec "$@"
