@@ -1,22 +1,18 @@
-# Base image
 FROM ubuntu:20.04
 
-# Set timezone environment variables to avoid tzdata interactive configuration
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Etc/UTC
-
-# Install Apache and necessary modules
 RUN apt-get update && \
-    apt-get install -y apache2 apache2-utils tzdata && \
-    a2enmod dav dav_fs dav_lock auth_digest && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y apache2 apache2-utils && \
+    apt-get clean
 
-# Copy configuration and entrypoint script
+RUN mkdir -p /var/www/html/media && \
+    chown -R www-data:www-data /var/www/html/media && \
+    a2enmod dav && \
+    a2enmod dav_fs
+
 COPY webdav.conf /etc/apache2/sites-available/000-default.conf
+
+# Entrypoint script to generate password file
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Set the entrypoint and default command
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2ctl", "-D", "FOREGROUND"]
+CMD ["/entrypoint.sh"]
