@@ -4,8 +4,8 @@ services:
     ports:
       - 82:80
     environment:
-      - WEBDAV_USERNAME=orchid
-      - WEBDAV_PASSWORD=orchid
+      - WEBDAV_USERNAME=your_username
+      - WEBDAV_PASSWORD=your_password
     volumes:
       - /media:/media
     image: ghcr.io/chosomeister/ubuntu-apache-webdav-docker:latest
